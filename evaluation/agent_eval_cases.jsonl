@@ -1,0 +1,3 @@
+﻿{"case_id":"skill-001","source_text":"Built a machine learning project using Python, Pandas and Scikit-learn.","expected_skills":["Python","Pandas","Scikit-learn"]}
+{"case_id":"skill-002","source_text":"Developed REST APIs using FastAPI and stored data in MySQL.","expected_skills":["FastAPI","MySQL"]}
+{"case_id":"skill-003","source_text":"Created dashboards using Power BI and performed SQL analysis.","expected_skills":["Power BI","SQL"]}

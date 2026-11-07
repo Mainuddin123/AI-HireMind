@@ -1,0 +1,1 @@
+﻿"""AI HireMind Streamlit frontend."""

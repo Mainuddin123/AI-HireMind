@@ -1,0 +1,46 @@
+﻿# Virtual environments
+venv/
+.venv/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE
+.vscode/
+
+# Logs
+*.log
+
+# Uploaded resumes and candidate documents
+uploads/
+backend/uploads/
+
+# LangGraph checkpoints and local databases
+backend/storage/
+*.sqlite
+*.sqlite3
+*.db
+
+# Generated files
+dist/
+build/
+*.egg-info/
+
+# Backup files
+*.bak
+*.backup*
+*.backup_*
+
+# Development-only scripts
+backend/authentication/create_recruiter.py
