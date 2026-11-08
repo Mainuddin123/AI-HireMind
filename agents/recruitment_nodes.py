@@ -597,17 +597,18 @@ def explanation_node(state: dict) -> dict:
 def human_review_node(state: dict) -> dict:
     """
     Pause until a recruiter submits an explicit decision.
+
+    Sensitive candidate analysis remains in the LangGraph state.
+    Only a minimal, non-sensitive notification is sent through
+    the interrupt payload so it is not exposed in LangSmith traces.
     """
 
     review = interrupt({
         "type": "human_review_required",
-
         "message": (
             "Review the candidate evidence and AI analysis "
             "before recording your decision."
         ),
-
-        "analysis": state.get("analysis", {}),
     })
 
     if not isinstance(review, dict):
@@ -634,8 +635,7 @@ def human_review_node(state: dict) -> dict:
         "approval_status": (
             "approved" if approved else "rejected"
         ),
-
         "reviewer_id": reviewer_id,
-
         "reviewer_comment": comment or "",
     }
+

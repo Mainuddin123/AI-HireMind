@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 
 
 class JsonFormatter(logging.Formatter):
+
     def format(self, record):
         payload = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -73,15 +74,26 @@ def log_agent_event(
 
 
 def get_observability_status():
+    tracing_enabled = (
+        os.getenv("LANGSMITH_TRACING", "").lower() == "true"
+        and bool(os.getenv("LANGSMITH_API_KEY"))
+    )
+
     return {
         "application_logging": True,
-        "langsmith_tracing_configured": (
-            os.getenv("LANGCHAIN_TRACING_V2", "").lower() == "true"
-            and bool(os.getenv("LANGCHAIN_API_KEY"))
+        "langsmith_tracing_configured": tracing_enabled,
+        "langsmith_api_key_present": bool(
+            os.getenv("LANGSMITH_API_KEY")
         ),
         "langsmith_project": os.getenv(
-            "LANGCHAIN_PROJECT",
-            "ai-hiremind"
+            "LANGSMITH_PROJECT",
+            "default"
+        ),
+        "trace_inputs_hidden": (
+            os.getenv("LANGSMITH_HIDE_INPUTS", "").lower() == "true"
+        ),
+        "trace_outputs_hidden": (
+            os.getenv("LANGSMITH_HIDE_OUTPUTS", "").lower() == "true"
         ),
         "sensitive_document_content_logged": False
     }

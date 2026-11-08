@@ -1,5 +1,8 @@
-
+from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# Load .env into process environment before LangSmith initializes.
+load_dotenv()
 
 
 class Settings(BaseSettings):

@@ -1,5 +1,4 @@
-﻿
-import logging
+﻿import logging
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -22,6 +21,10 @@ from backend.services.agent_memory_service import (
     get_user_memories,
     save_user_memory,
     delete_user_memory,
+)
+
+from backend.services.langsmith_tracing import (
+    langsmith_privacy_context,
 )
 
 from backend.models.agent_review import AgentReview
@@ -78,6 +81,8 @@ def log_checkpoint_state(label: str, user_id: int, thread_id: str):
             )
             return None
 
+        configurable = snapshot.config.get("configurable", {})
+
         logger.info(
             "%s | user_id=%s | thread_id=%s | next=%s | "
             "checkpoint_id=%s | values=%s",
@@ -85,7 +90,7 @@ def log_checkpoint_state(label: str, user_id: int, thread_id: str):
             user_id,
             thread_id,
             snapshot.next,
-            getattr(snapshot.config.get("configurable", {}), "checkpoint_id", None),
+            configurable.get("checkpoint_id"),
             list(snapshot.values.keys())
         )
 
@@ -147,10 +152,13 @@ def evaluate_with_agents(
     }
 
     try:
-        result = recruitment_graph.invoke(
-            initial_state,
-            config=get_graph_config(thread_id)
-        )
+        # LangSmith privacy context applies to the root graph
+        # and its nested LangGraph executions.
+        with langsmith_privacy_context():
+            result = recruitment_graph.invoke(
+                initial_state,
+                config=get_graph_config(thread_id)
+            )
 
         snapshot = log_checkpoint_state(
             "EVALUATION CHECKPOINT",
@@ -327,20 +335,21 @@ def approve_agentic_evaluation(
         )
 
     # --------------------------------------------------
-    # 4. RESUME LANGGRAPH
+    # 4. RESUME LANGGRAPH WITH PRIVACY PROTECTION
     # --------------------------------------------------
 
     try:
-        result = recruitment_graph.invoke(
-            Command(
-                resume={
-                    "approved": request.approved,
-                    "reviewer_id": current_user.id,
-                    "comment": request.comment
-                }
-            ),
-            config=config
-        )
+        with langsmith_privacy_context():
+            result = recruitment_graph.invoke(
+                Command(
+                    resume={
+                        "approved": request.approved,
+                        "reviewer_id": current_user.id,
+                        "comment": request.comment
+                    }
+                ),
+                config=config
+            )
 
     except Exception:
         logger.exception(
