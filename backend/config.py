@@ -1,7 +1,6 @@
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# Load .env into process environment before LangSmith initializes.
 load_dotenv()
 
 
@@ -12,14 +11,23 @@ class Settings(BaseSettings):
     app_env: str = "development"
     debug: bool = False
 
-    # MySQL database settings
+    # Local MySQL settings
     db_host: str = "localhost"
     db_port: int = 3306
     db_name: str = "ai_hiremind"
     db_user: str = "hiremind_user"
     db_password: str
 
-    # JWT authentication settings
+    # TiDB Cloud settings
+    database_provider: str = "mysql"
+    tidb_host: str | None = None
+    tidb_port: int = 4000
+    tidb_db_name: str = "ai_hiremind"
+    tidb_user: str | None = None
+    tidb_password: str | None = None
+    ca_path: str | None = None
+
+    # JWT settings
     jwt_secret_key: str
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
