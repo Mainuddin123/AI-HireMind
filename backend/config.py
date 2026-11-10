@@ -1,6 +1,8 @@
+
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+# Load environment variables before initializing settings
 load_dotenv()
 
 
@@ -16,10 +18,12 @@ class Settings(BaseSettings):
     db_port: int = 3306
     db_name: str = "ai_hiremind"
     db_user: str = "hiremind_user"
-    db_password: str
+    db_password: str = ""
+
+    # Database provider
+    database_provider: str = "mysql"
 
     # TiDB Cloud settings
-    database_provider: str = "mysql"
     tidb_host: str | None = None
     tidb_port: int = 4000
     tidb_db_name: str = "ai_hiremind"
@@ -27,7 +31,7 @@ class Settings(BaseSettings):
     tidb_password: str | None = None
     ca_path: str | None = None
 
-    # JWT settings
+    # JWT authentication settings
     jwt_secret_key: str
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
